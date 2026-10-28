@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
     agentFeedback: true,
   },
   cacheComponents: true,
+  images: {
+    // Foto court di-upload ke Cloudinary.
+    remotePatterns: [new URL("https://res.cloudinary.com/**")],
+  },
   partialPrefetching: true,
   turbopack: {
     rules: {
