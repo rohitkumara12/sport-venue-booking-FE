@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -15,16 +14,18 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "SPORTIVA | Sport Venue Booking",
-    template: "%s | SPORTIVA",
+    default: "CourtKita | Sport Venue Booking",
+    template: "%s | CourtKita",
   },
   description:
-    "Platform membership dan pengelolaan venue olahraga.",
+    "Platform booking lapangan olahraga, membership, dan pengelolaan venue.",
 };
 
 export default function RootLayout({
   children,
-}: LayoutProps<"/">) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="id"
