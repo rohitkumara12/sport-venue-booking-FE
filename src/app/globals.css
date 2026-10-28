@@ -9,6 +9,15 @@
   --muted: #6b7280;
   --line: #e5e7eb;
   --danger: #dc2626;
+
+  /* Token tambahan yang dipakai komponen shadcn (src/components/ui). */
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #123c2b;
 }
 
 @theme inline {
@@ -20,6 +29,14 @@
   --color-muted:var(--muted);
   --color-line: var(--line);
   --color-danger: var(--danger);
+  --color-destructive: var(--danger);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: arial,Helvetica, sans-serif;
   --font-display: arial,Helvetica, sans-serif;
 }
