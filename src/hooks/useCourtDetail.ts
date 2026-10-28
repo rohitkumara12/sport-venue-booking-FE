@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { getCourtDetail, isAbortError, isNotFoundError } from "@/services/court.service";
 import type { CourtDetail } from "@/types/court";
 
+const POLL_INTERVAL_MS = 15000;
+
 interface Result {
   key: string;
   court: CourtDetail | null;
@@ -33,6 +35,19 @@ export function useCourtDetail(id: string, date: string) {
       });
 
     return () => controller.abort();
+  }, [id, date, requestKey]);
+
+  // Ambil ulang slot setiap 15 detik di belakang layar, supaya slot yang baru dipesan orang lain
+  // (atau yang dilepas karena expired/canceled) langsung terlihat tanpa refresh halaman.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      getCourtDetail(id, date)
+        .then((court) =>
+          setResult((prev) => (prev && prev.key === requestKey ? { ...prev, court, error: null, notFound: false } : prev)),
+        )
+        .catch(() => {});
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
   }, [id, date, requestKey]);
 
   const isLoading = result === null || result.key !== requestKey;

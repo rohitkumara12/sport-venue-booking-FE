@@ -7,7 +7,8 @@ import { Menu, X } from "lucide-react"
 
 const NAV_LINKS = [
     { href: "#lapangan", label:"lapangan"}, 
-    { href:"#cara-memesan", label:"Cara memesan"}
+    { href:"#cara-memesan", label:"Cara memesan"},
+    { href:"/bookings", label:"Pesanan saya"}
 ]
 
 export function Navbar() {
