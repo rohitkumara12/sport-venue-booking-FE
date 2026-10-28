@@ -1,20 +1,38 @@
-import type { Metadata } from 'next';
-import { Toaster } from 'sonner';
-import './globals.css';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: 'Sport Venue Booking',
-  description: 'Book your favorite sport court online',
+  title: {
+    default: "CourtKita | Sport Venue Booking",
+    template: "%s | CourtKita",
+  },
+  description:
+    "Platform booking lapangan olahraga, membership, dan pengelolaan venue.",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en">
-      <body>
+    <html
+      lang="id"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">
         {children}
         <Toaster richColors position="top-center" />
       </body>
