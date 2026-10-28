@@ -2,21 +2,26 @@
 
 :root{
   --background: #ffffff;
-  --background: #173cb2;
+  --foreground: #111827;
   --primary: #123c2b;
   --accent : #c9f36a;
-  --surface: #f5f64f;
+  --surface: #ffffff;
   --muted: #6b7280;
+  --line: #e5e7eb;
+  --danger: #dc2626;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: vae(--foreground);
+  --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-accent: var(--accent);
   --color-surface:var(--surface);
   --color-muted:var(--muted);
+  --color-line: var(--line);
+  --color-danger: var(--danger);
   --font-sans: arial,Helvetica, sans-serif;
+  --font-display: arial,Helvetica, sans-serif;
 }
 
 *{
@@ -28,7 +33,10 @@ html{
 }
 body{
   margin:0;
-  bakcground: var (--background);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
   color:var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
