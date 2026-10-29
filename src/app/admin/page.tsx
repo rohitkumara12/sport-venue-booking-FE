@@ -117,12 +117,12 @@ export default function AdminPage() {
 
         if (!active) return;
 
-        if (result.payload.role !== "ADMIN") {
+        if (result.data.role !== "ADMIN") {
           router.replace("/dashboard");
           return;
         }
 
-        setUser(result.payload);
+        setUser(result.data);
       } catch {
         if (active) router.replace("/login");
       } finally {

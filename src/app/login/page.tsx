@@ -42,15 +42,15 @@ export default function LoginPage() {
 
     const profile =   await GetProfile()
     console.log("profile berhasil",profile)
-    console.log("Role :",profile.payload.role)
+    console.log("Role :",profile.data.role)
 
 
-    if(profile.payload.role === 'ADMIN') {
+    if(profile.data.role === 'ADMIN') {
       router.replace('/admin');
-    } else  if (profile.payload.role === 'USER'){
+    } else  if (profile.data.role === 'USER'){
       router.replace('/dashboard')
     } else{
-       console.error("Role tidak dikenali:", profile.payload.role);
+       console.error("Role tidak dikenali:", profile.data.role);
     }
     
   } catch (error) {
