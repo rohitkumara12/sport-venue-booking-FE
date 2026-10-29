@@ -27,11 +27,11 @@ export default function DashboardPage() {
         if (active) {
           return;
         }
-        if ( result.payload.role === 'ADMIN'){
+        if ( result.data.role === 'ADMIN'){
           router.replace("/admin");
           return
         }
-        setUser(result.payload)
+        setUser(result.data)
       } catch (error) {
         console.error("User belum login atau sesi berakhir:", error);
         router.replace("/login");
