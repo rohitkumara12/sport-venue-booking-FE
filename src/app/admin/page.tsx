@@ -1,9 +1,8 @@
-
 "use client";
 
-import { GetProfile } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { AdminGuard } from "./AdminGuard";
 import {
   CalendarDays,
   ChevronDown,
@@ -17,11 +16,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-
-type UserProfile = {
-  email: string;
-  role: "USER" | "ADMIN";
-};
+import { useAuth } from "@/context/auth.context";
 
 type BookingStatus = "Confirmed" | "Pending" | "Cancelled";
 
@@ -98,44 +93,14 @@ const venues = [
 
 export default function AdminPage() {
   const router = useRouter();
+  const { user } = useAuth();
 
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [activeTab, setActiveTab] = useState<"Bookings" | "Venues">(
     "Bookings"
   );
-
-  useEffect(() => {
-    let active = true;
-
-    async function checkAdmin() {
-      try {
-        const result = await GetProfile();
-
-        if (!active) return;
-
-        if (result.payload.role !== "ADMIN") {
-          router.replace("/dashboard");
-          return;
-        }
-
-        setUser(result.payload);
-      } catch {
-        if (active) router.replace("/login");
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    checkAdmin();
-
-    return () => {
-      active = false;
-    };
-  }, [router]);
 
   const filteredBookings = useMemo(() => {
     const keyword = search.toLowerCase().trim();
@@ -154,17 +119,9 @@ export default function AdminPage() {
     });
   }, [search, statusFilter]);
 
-  if (loading || !user) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f8f8f5]">
-        <p className="text-sm text-stone-500">
-          Memeriksa akses admin...
-        </p>
-      </main>
-    );
-  }
-
   return (
+    <AdminGuard>
+
     <div className="min-h-screen bg-[#f8f8f5] text-[#262d27]">
       {sidebarOpen && (
         <button
@@ -273,10 +230,10 @@ export default function AdminPage() {
         <div className="mt-auto border-t border-[#e8e9e2] p-4">
           <div className="flex items-center gap-3 px-2 py-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#edf3ed] text-sm font-semibold text-[#245c43]">
-              {user.email.charAt(0).toUpperCase()}
+              {user?.email?.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold">{user.email}</p>
+              <p className="truncate text-xs font-semibold">{user?.email}</p>
               <p className="mt-1 text-[11px] text-stone-400">
                 Administrator
               </p>
@@ -318,7 +275,7 @@ export default function AdminPage() {
               Admin workspace
             </span>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#245c43] text-xs font-semibold text-white">
-              {user.email.charAt(0).toUpperCase()}
+              {user?.email?.charAt(0).toUpperCase()}
             </div>
           </div>
         </header>
@@ -570,7 +527,7 @@ export default function AdminPage() {
                 Demo data · Not connected to the database
               </p>
               <p className="text-[11px] text-stone-400">
-                Signed in as {user.role}
+                Signed in as {user?.role}
               </p>
             </div>
           </section>
@@ -582,5 +539,6 @@ export default function AdminPage() {
         </main>
       </div>
     </div>
+    </AdminGuard>
   );
 }

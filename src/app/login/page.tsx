@@ -13,12 +13,14 @@ import {
 import { useRouter } from "next/navigation";
 import AuthLayout from "../../components/authLayout";
 import { GetProfile, loginRequest } from "@/lib/api";
-import { da } from "zod/v4/locales";
 import axios from "axios";
+import { useAuth } from "@/context/auth.context";
 
 export default function LoginPage() {
   const router = useRouter();
+  const {refreshProfile} = useAuth()
   const [showPassword, setShowPassword] = useState(false);
+  
 
   const {
     register,
@@ -40,18 +42,17 @@ export default function LoginPage() {
     const result = await loginRequest(data);
     console.log("login berhasil",result)
 
-    const profile =   await GetProfile()
-    console.log("profile berhasil",profile)
-    console.log("Role :",profile.payload.role)
-
-
-    if(profile.payload.role === 'ADMIN') {
-      router.replace('/admin');
-    } else  if (profile.payload.role === 'USER'){
-      router.replace('/dashboard')
-    } else{
-       console.error("Role tidak dikenali:", profile.payload.role);
-    }
+    const user = await refreshProfile()
+if (!user?.role) {
+  throw new Error("Role user tidak ditemukan");
+}
+      if (user.role === "ADMIN") {
+    router.push("/admin");
+  } else if (user.role === "USER") {
+    router.push("/");
+  } else {
+    console.error("Role tidak dikenali:", user.role);
+  }
     
   } catch (error) {
     if(axios.isAxiosError(error)){
@@ -135,6 +136,13 @@ export default function LoginPage() {
             </p>
           )}
         </div>
+        <div className="flex justify-end">
+      <Link
+          href="/forgot-password"
+          className="text-sm font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline">
+          Lupa password?
+        </Link>
+      </div>
 
         <button
           type="submit"
