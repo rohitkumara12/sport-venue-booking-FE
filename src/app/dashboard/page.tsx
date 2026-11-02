@@ -20,24 +20,34 @@ export default function DashboardPage() {
   useEffect(() => {
     let active = true;
 
-    async function checkAuth() {
-      try {
-        const result = await GetProfile();
+    
+async function checkAuth() {
+  try {
+    const result = await GetProfile();
 
-        if (active) {
-          return;
-        }
-        if ( result.data.role === 'ADMIN'){
-          router.replace("/admin");
-          return
-        }
-        setUser(result.data)
-      } catch (error) {
-        console.error("User belum login atau sesi berakhir:", error);
-        router.replace("/login");
-      } finally {
-        if (active) setLoading(false);
-      }
+    // Komponen sudah tidak aktif, hentikan proses
+    if (!active) {
+      return;
+    }
+
+    // Data user ada di properti data
+    const user = result.data;
+
+    if (!user) {
+      throw new Error("Data user tidak ditemukan");
+    }
+
+    if (user.role === "ADMIN") {
+      router.replace("/admin");
+      return;
+    }
+
+    setUser(user);
+  } catch (error) {
+    console.error("User belum login atau sesi berakhir:", error);
+
+    if (active) {
+      router.replace("/login");
     }
   } finally {
     if (active) {

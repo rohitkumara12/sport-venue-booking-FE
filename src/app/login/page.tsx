@@ -42,18 +42,17 @@ export default function LoginPage() {
     const result = await loginRequest(data);
     console.log("login berhasil",result)
 
-    const profile =   await GetProfile()
-    console.log("profile berhasil",profile)
-    console.log("Role :",profile.data.role)
-
-
-    if(profile.data.role === 'ADMIN') {
-      router.replace('/admin');
-    } else  if (profile.data.role === 'USER'){
-      router.replace('/dashboard')
-    } else{
-       console.error("Role tidak dikenali:", profile.data.role);
-    }
+    const user = await refreshProfile()
+if (!user?.role) {
+  throw new Error("Role user tidak ditemukan");
+}
+      if (user.role === "ADMIN") {
+    router.push("/admin");
+  } else if (user.role === "USER") {
+    router.push("/");
+  } else {
+    console.error("Role tidak dikenali:", user.role);
+  }
     
   } catch (error) {
     if(axios.isAxiosError(error)){

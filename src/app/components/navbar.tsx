@@ -8,10 +8,10 @@ import { logoutRequest } from "@/lib/api";
 import { useAuth } from "@/context/auth.context";
 
 const NAV_LINKS = [
-    { href: "#lapangan", label:"lapangan"}, 
-    { href:"#cara-memesan", label:"Cara memesan"},
-    { href:"/bookings", label:"Pesanan saya"}
-]
+  { href: "#lapangan", label: "Lapangan" },
+  { href: "#cara-memesan", label: "Cara memesan" },
+  { href: "/bookings", label: "Pesanan saya" },
+];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);

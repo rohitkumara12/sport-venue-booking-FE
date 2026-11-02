@@ -102,35 +102,6 @@ export default function AdminPage() {
     "Bookings"
   );
 
-  useEffect(() => {
-    let active = true;
-
-    async function checkAdmin() {
-      try {
-        const result = await GetProfile();
-
-        if (!active) return;
-
-        if (result.data.role !== "ADMIN") {
-          router.replace("/dashboard");
-          return;
-        }
-
-        setUser(result.data);
-      } catch {
-        if (active) router.replace("/login");
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    checkAdmin();
-
-    return () => {
-      active = false;
-    };
-  }, [router]);
-
   const filteredBookings = useMemo(() => {
     const keyword = search.toLowerCase().trim();
 
