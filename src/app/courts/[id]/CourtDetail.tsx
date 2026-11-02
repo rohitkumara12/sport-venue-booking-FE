@@ -9,8 +9,22 @@ import { useCourtDetail } from "@/hooks/useCourtDetail"
 import { formatRupiah } from "@/lib/format"
 import { CourtLines } from "@/app/components/CourtLines"
 import { EmptyState } from "@/app/components/EmptyState"
+import { BookingPanel, MAX_BOOKING_HOURS, type SlotSelection } from "./BookingPanel"
+import { ReviewList } from "./ReviewList"
 
 const todayString = () => format(new Date(), "yyyy-MM-dd")
+
+// Klik slot untuk memilih; klik slot di sebelahnya untuk memperpanjang (maks. 4 jam berurutan).
+function nextSelection(sel: SlotSelection | null, i: number): SlotSelection | null {
+    if (!sel) return { start: i, hours: 1 }
+    const end = sel.start + sel.hours - 1
+    if (i === end + 1 && sel.hours < MAX_BOOKING_HOURS) return { start: sel.start, hours: sel.hours + 1 }
+    if (i === sel.start - 1 && sel.hours < MAX_BOOKING_HOURS) return { start: i, hours: sel.hours + 1 }
+    if (sel.hours === 1 && i === sel.start) return null
+    if (i === sel.start) return { start: i + 1, hours: sel.hours - 1 }
+    if (i === end) return { start: sel.start, hours: sel.hours - 1 }
+    return { start: i, hours: 1 }
+}
 
 export function CourtDetail() {
     const { id } = useParams<{ id: string }>()
@@ -22,6 +36,7 @@ export function CourtDetail() {
         return /^\d{4}-\d{2}-\d{2}$/.test(fromUrl) && fromUrl >= today ? fromUrl : today
     })
     const [activePhoto, setActivePhoto] = useState(0)
+    const [selection, setSelection] = useState<SlotSelection | null>(null)
 
     const { court, isLoading, error, notFound, reload } = useCourtDetail(id, date)
 
@@ -49,6 +64,13 @@ export function CourtDetail() {
     if (isLoading || !court) return <CourtDetailSkeleton />
 
     const photo = court.photos[activePhoto] ?? court.photos[0]
+
+    // Hasil polling bisa membuat slot pilihan jadi terisi; kalau begitu pilihannya dianggap batal.
+    const selectedSlots = selection ? court.slots.slice(selection.start, selection.start + selection.hours) : []
+    const activeSelection = selection && selectedSlots.length === selection.hours && selectedSlots.every((s) => s.isAvailable)
+        ? selection
+        : null
+    const isSelected = (i: number) => !!activeSelection && i >= activeSelection.start && i < activeSelection.start + activeSelection.hours
 
     return (
         <div className="grid gap-8 lg:grid-cols-[3fr_2fr]">
@@ -111,6 +133,8 @@ export function CourtDetail() {
                         {court.description || "Belum ada deskripsi untuk lapangan ini."}
                     </p>
                 </div>
+
+                <ReviewList courtId={court.id} />
             </div>
 
             <section aria-labelledby="jadwal-heading" className="h-fit rounded-2xl border border-line bg-surface p-5 lg:sticky lg:top-20">
@@ -123,7 +147,10 @@ export function CourtDetail() {
                         type="date"
                         value={date}
                         min={today}
-                        onChange={(e) => setDate(e.target.value || today)}
+                        onChange={(e) => {
+                            setDate(e.target.value || today)
+                            setSelection(null)
+                        }}
                         className="w-full rounded-xl border border-line bg-white py-3 pl-10 pr-4 text-base outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                     />
                 </label>
@@ -135,22 +162,37 @@ export function CourtDetail() {
                 </p>
 
                 <ul className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-3">
-                    {court.slots.map((slot) => (
-                        <li
-                            key={slot.start}
-                            className={`rounded-lg border px-2 py-2.5 text-center text-sm font-semibold ${slot.isAvailable
-                                ? "border-primary/30 bg-white text-primary"
-                                : "border-line bg-line/60 text-muted line-through"}`}>
-                            {slot.label}
-                            <span className="sr-only">{slot.isAvailable ? " kosong" : " terisi"}</span>
+                    {court.slots.map((slot, i) => (
+                        <li key={slot.start}>
+                            <button
+                                type="button"
+                                disabled={!slot.isAvailable}
+                                aria-pressed={isSelected(i)}
+                                onClick={() => setSelection(nextSelection(activeSelection, i))}
+                                className={`w-full rounded-lg border px-2 py-2.5 text-center text-sm font-semibold ${isSelected(i)
+                                    ? "border-primary bg-primary text-white"
+                                    : slot.isAvailable
+                                        ? "border-primary/30 bg-white text-primary hover:bg-primary/5"
+                                        : "cursor-not-allowed border-line bg-line/60 text-muted line-through"}`}>
+                                {slot.label}
+                                <span className="sr-only">{slot.isAvailable ? " kosong" : " terisi"}</span>
+                            </button>
                         </li>
                     ))}
                 </ul>
 
-                <div className="mt-4 flex gap-4 text-xs text-muted">
+                <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted">
                     <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded border border-primary/30 bg-white" />Kosong</span>
+                    <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-primary" />Dipilih</span>
                     <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded bg-line" />Terisi</span>
                 </div>
+
+                <BookingPanel
+                    court={court}
+                    date={date}
+                    selection={activeSelection}
+                    onClear={() => setSelection(null)}
+                />
             </section>
         </div>
     )
