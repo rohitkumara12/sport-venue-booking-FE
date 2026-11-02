@@ -39,12 +39,19 @@ export default function DashboardPage() {
         if (active) setLoading(false);
       }
     }
+  } finally {
+    if (active) {
+      setLoading(false);
+    }
+  }
+}
 
-    checkAuth();
+checkAuth();
 
-    return () => {
-      active = false;
-    };
+return () => {
+  active = false;
+};
+
   }, [router]);
 
   if (loading) {

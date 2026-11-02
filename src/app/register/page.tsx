@@ -24,20 +24,28 @@ export default function RegisterPage() {
   
 async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
+
+  console.log("REGISTER HANDLER JALAN");
+
   setError("");
   setSuccess("");
 
   const form = new FormData(event.currentTarget);
+
   const name = String(form.get("name") ?? "").trim();
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
-  const confirmPassword = String(form.get("confirmPassword") ?? "");
+  const confirmPassword = String(
+    form.get("confirmPassword") ?? ""
+  );
 
+  // 1. Validasi field
   if (!name || !email || !password || !confirmPassword) {
     setError("Semua field wajib diisi.");
     return;
   }
 
+  // 2. Validasi password
   if (password.length < 8) {
     setError("Password harus terdiri dari minimal 8 karakter.");
     return;
@@ -48,51 +56,78 @@ async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     return;
   }
 
+  // 3. Validasi menggunakan Zod
+  const validation = registerSchema.safeParse({
+ 
+      name,
+      email,
+      password,
+      confirmPassword,
+  });
+
+  if (!validation.success) {
+    setError(validation.error.issues[0].message);
+    return;
+  }
+
+  // 4. Request ke backend
   try {
     setIsSubmitting(true);
 
-    console.log("Data register:",{
-      name,
-      email,
-      passwordReceived : boolean(password)
-    })
+    console.log(
+      "API BASE URL:",
+      process.env.NEXT_PUBLIC_API_URL
+    );
 
-    const validation = await registerSchema.safeParse({
-      body : {
-        name,
-        email,
-        password,
-        confirmPassword
-      },
-    });
-    if (!validation.success) {
-      setError(validation.error.issues[0].message)
-    } 
     const result = await registerRequest({
       name,
       email,
       password,
-      confirmPassword
+      confirmPassword,
     });
 
-    console.log("Register berhasil:", result);
-    setSuccess("Registrasi berhasil! Mengalihkan ke halaman login...");
+    console.log("REGISTER RESPONSE:", result);
 
+    setSuccess(
+      "Registrasi berhasil! Mengalihkan ke halaman login..."
+    );
+
+    // 5. Redirect setelah berhasil
     setTimeout(() => {
       router.push("/login");
     }, 1000);
   } catch (err: unknown) {
-    if (axios.isAxiosError(err)){
-      console.error("Status :",err.response?.status);
-      console.error("Response backend:",JSON.stringify(err.response?.data,null,2));
+    if (axios.isAxiosError(err)) {
+      console.error("REQUEST URL:", err.config?.url);
+      console.error("BASE URL:", err.config?.baseURL);
+      console.error("FULL URL:", err.request?.responseURL);
+      console.error("STATUS:", err.response?.status);
+      console.error("RESPONSE:", err.response?.data);
+
+      if (err.response?.status === 409) {
+        setError("Email sudah terdaftar. Gunakan email lain.");
+      } else if (err.response) {
+        setError(
+          typeof err.response.data?.message === "string"
+            ? err.response.data.message
+            : "Registrasi gagal. Periksa kembali data Anda."
+        );
+      } else {
+        setError(
+          "Tidak dapat terhubung ke backend. Periksa URL API dan koneksi server."
+        );
+      }
     } else {
-      console.error("Error :",err)
+      console.error("ERROR:", err);
+      setError("Terjadi kesalahan yang tidak terduga.");
     }
-    setError("Registrasi gagal. Akun sudah terdaftar.")
   } finally {
     setIsSubmitting(false);
   }
 }
+
+ 
+
 
   return (
     <AuthLayout

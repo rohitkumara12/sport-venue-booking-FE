@@ -13,12 +13,14 @@ import {
 import { useRouter } from "next/navigation";
 import AuthLayout from "../../components/authLayout";
 import { GetProfile, loginRequest } from "@/lib/api";
-import { da } from "zod/v4/locales";
 import axios from "axios";
+import { useAuth } from "@/context/auth.context";
 
 export default function LoginPage() {
   const router = useRouter();
+  const {refreshProfile} = useAuth()
   const [showPassword, setShowPassword] = useState(false);
+  
 
   const {
     register,
@@ -135,6 +137,13 @@ export default function LoginPage() {
             </p>
           )}
         </div>
+        <div className="flex justify-end">
+      <Link
+          href="/forgot-password"
+          className="text-sm font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline">
+          Lupa password?
+        </Link>
+      </div>
 
         <button
           type="submit"
