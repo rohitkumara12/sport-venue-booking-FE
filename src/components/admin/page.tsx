@@ -4,8 +4,11 @@ import {
   MapPinned,
   Users,
   Wallet,
+  ArrowUpRight,
+  Clock3,
 } from "lucide-react";
 import StatCard from "./statCard";
+
 const stats = [
   {
     title: "Total Venues",
@@ -60,15 +63,25 @@ const bookings = [
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
-      <section>
-        <h2 className="text-2xl font-bold text-gray-900">
-          Overview
-        </h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Berikut ringkasan aktivitas platform kamu.
-        </p>
+      
+      {/* Page Heading */}
+      <section className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#123c2b]">
+            Dashboard Overview
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Pantau aktivitas dan performa venue CourtKita.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Clock3 size={16} />
+          <span>Admin Dashboard</span>
+        </div>
       </section>
 
+      {/* Statistics */}
       <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
           <StatCard
@@ -76,23 +89,29 @@ export default function AdminDashboardPage() {
             title={stat.title}
             value={stat.value}
             description={stat.description}
+            icon={stat.icon}
           />
         ))}
       </section>
 
+      {/* Recent Bookings */}
       <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-        <div className="border-b border-gray-100 px-6 py-5">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Recent Bookings
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Contoh daftar pemesanan lapangan.
-          </p>
+        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+          <div>
+            <h2 className="text-lg font-bold text-[#123c2b]">
+              Recent Bookings
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Ringkasan pemesanan terbaru.
+            </p>
+          </div>
+
+          <ArrowUpRight className="text-[#123c2b]" size={20} />
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-gray-500">
+            <thead className="bg-[#f7faf7] text-gray-500">
               <tr>
                 <th className="px-6 py-4 font-medium">Booking ID</th>
                 <th className="px-6 py-4 font-medium">Customer</th>
@@ -104,14 +123,14 @@ export default function AdminDashboardPage() {
 
             <tbody className="divide-y divide-gray-100">
               {bookings.map((booking) => (
-                <tr key={booking.id} className="hover:bg-gray-50">
-                  <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                <tr key={booking.id} className="transition hover:bg-[#f7faf7]">
+                  <td className="whitespace-nowrap px-6 py-4 font-semibold text-[#123c2b]">
                     {booking.id}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-gray-600">
+                  <td className="whitespace-nowrap px-6 py-4 text-gray-700">
                     {booking.customer}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-gray-600">
+                  <td className="whitespace-nowrap px-6 py-4 text-gray-700">
                     {booking.court}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-gray-600">
@@ -119,10 +138,10 @@ export default function AdminDashboardPage() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         booking.status === "Confirmed"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-yellow-50 text-yellow-700"
+                          ? "bg-[#c9f36a]/30 text-[#123c2b]"
+                          : "bg-amber-50 text-amber-700"
                       }`}
                     >
                       {booking.status}

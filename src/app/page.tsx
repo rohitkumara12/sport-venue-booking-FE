@@ -6,6 +6,7 @@ import { HowItWorks } from "./components/HowItWorks";
 import { Footer } from "./components/footer";
 
 import { CourtCardSkeleton } from "./components/CourtCardSkeleton";
+import { MembershipCTA } from "./components/membershipCTA";
 
 export default function Home() {
   return (
@@ -23,6 +24,7 @@ export default function Home() {
         {/* CourtBrowser sudah berisi pencarian, filter, daftar CourtCard, EmptyState, dan skeleton.
             Karena itu CourtCard / EmptyState TIDAK perlu ditulis lagi di halaman ini.
             fallback = tampilan sementara (3 skeleton) selagi CourtBrowser disiapkan. */}
+            <MembershipCTA/>
         <Suspense
           fallback={
             <div className="mx-auto grid max-w-6xl gap-5 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">

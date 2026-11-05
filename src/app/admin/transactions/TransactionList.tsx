@@ -88,10 +88,23 @@ function TransactionRow({ transaction: t, onDecided }: { transaction: AdminTrans
         <li className="grid gap-4 rounded-2xl border border-line bg-surface p-4 sm:grid-cols-[1fr_auto] sm:p-5">
             <div className="space-y-1 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-display text-lg font-bold text-primary">{t.booking?.court.name ?? "-"}</span>
+                    <span className="font-display text-lg font-bold text-primary">
+                        {t.type === "BOOKING_PAYMENT"
+                        ? t.booking?.court.name ?? "Booking"
+                            :t.membership?.membershipPlan.name ?? "Membership"}
+                        </span>
                     <span className={`rounded-full px-3 py-1 text-xs font-bold ${TONE_CLASS[status.tone]}`}>{status.label}</span>
                 </div>
-                {t.booking && <p className="text-muted">{formatSchedule(t.booking.startTime, t.booking.endTime)}</p>}
+                {t.type === "BOOKING_PAYMENT" && t.booking && (
+                    <p className="text-muted">
+                        {formatSchedule(t.booking.startTime,t.booking.endTime)}
+                    </p>
+                )}
+                {t.type === "MEMBERSHIP_PURCHASE" && t.membership && (
+                    <p className="text-muted">
+                        {t.membership.totalSessions} sesi -{t.membership.membershipPlan.name}
+                    </p>
+                )}
                 <p>{t.user.name} · <span className="text-muted">{t.user.email}</span></p>
                 <p className="text-base font-bold text-foreground">{formatRupiah(t.amount)}</p>
                 {awaiting && <p className="font-semibold text-amber-700">Sisa waktu konfirmasi: <span className="tabular-nums">{countdown.label}</span></p>}

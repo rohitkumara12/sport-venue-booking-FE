@@ -3,8 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {GetProfile} from "@/lib/api";
-import { Router } from "lucide-react";
+import { GetProfile } from "@/lib/api";
 
 type UserProfile = {
   id: string;
@@ -14,6 +13,7 @@ type UserProfile = {
 
 export default function DashboardPage() {
   const router = useRouter();
+
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,42 +24,52 @@ export default function DashboardPage() {
       try {
         const result = await GetProfile();
 
-        if (active) {
+        // Hentikan proses jika component sudah tidak aktif
+        if (!active) return;
+
+        // Jika ADMIN, arahkan ke dashboard admin
+        if (result.data.role === "ADMIN") {
+          router.replace("/admin");
           return;
         }
-        if ( result.data.role === 'ADMIN'){
-          router.replace("/admin");
-          return
-        }
-        setUser(result.data)
+
+        // Jika USER, simpan data profile
+        setUser(result.data);
       } catch (error) {
         console.error("User belum login atau sesi berakhir:", error);
-        router.replace("/login");
+
+        if (active) {
+          router.replace("/login");
+        }
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
-  } finally {
-    if (active) {
-      setLoading(false);
-    }
-  }
-}
 
-checkAuth();
+    checkAuth();
 
-return () => {
-  active = false;
-};
-
+    // Cleanup ketika component dilepas
+    return () => {
+      active = false;
+    };
   }, [router]);
 
   if (loading) {
-    return <main className="p-8">Memeriksa sesi login...</main>;
+    return (
+      <main className="p-8">
+        Memeriksa sesi login...
+      </main>
+    );
   }
 
   if (!user) {
-    return <main className="p-8">Mengalihkan ke halaman login...</main>;
+    return (
+      <main className="p-8">
+        Mengalihkan ke halaman login...
+      </main>
+    );
   }
 
   return (
@@ -69,10 +79,14 @@ return () => {
       </h1>
 
       <div className="mt-6 rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">Selamat datang!</h2>
+        <h2 className="text-lg font-semibold">
+          Selamat datang!
+        </h2>
+
         <p className="mt-2 text-slate-600">
-          Name : {user.email}
+          Email: {user.email}
         </p>
+
         <p className="text-slate-600">
           Role: {user.role}
         </p>

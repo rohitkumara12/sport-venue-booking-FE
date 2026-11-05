@@ -7,6 +7,7 @@ import type {
     CourtReview,
     CreateBookingPayload,
     TransactionStatus,
+    AdminBooking
 } from "@/types/booking"
 
 // Fitur booking selalu memakai backend asli (tidak ada versi mock).
@@ -58,4 +59,11 @@ export async function confirmTransaction(id: string): Promise<void> {
 
 export async function rejectTransaction(id: string): Promise<void> {
     await api.patch(`/admin/transactions/${id}/reject`)
+}
+
+export async function getAdminBookings(): Promise<AdminBooking[]> {
+    const {data} = await api.get<ApiResponse<AdminBooking[]>>(
+        "/admin/bookings"
+    );
+    return data.data
 }

@@ -7,8 +7,8 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
-  useRef
 } from "react";
 import type { ReactNode } from "react";
 
@@ -23,47 +23,46 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
   const profileRequestId = useRef(0);
-  console.log("AUTH CONTEXT STATE:", {
-  user,
-  isLoading,
-});
+  const mounted = useRef(false);
 
   const refreshProfile = async (): Promise<User | null> => {
-  const requestId = ++profileRequestId.current;
+    const requestId = ++profileRequestId.current;
 
-  try {
-    console.log("MULAI REFRESH PROFILE");
-    const profile = await getProfile();
-     console.log("PROFILE BERHASIL:", profile);
+    try {
+      const profile = await getProfile();
 
-    setUser(profile)
+      if (mounted.current && requestId === profileRequestId.current) {
+        setUser(profile);
+      }
 
-   return profile;
-    
-  } catch (error) {
-    console.error("PROFILE GAGAL:", error);
+      return profile;
+    } catch (error) {
+      console.error("Gagal mengambil profile:", error);
 
-    setUser(null)
-    return null;
-  } finally {
-    console.log("PROFILE SELESAI, LOADING FALSE");
-    setIsLoading(false);
-  }
-};
+      if (mounted.current && requestId === profileRequestId.current) {
+        setUser(null);
+      }
+
+      return null;
+    } finally {
+      if (mounted.current && requestId === profileRequestId.current) {
+        setIsLoading(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    const loadProfile = async () => {
-      console.log("MULAI LOAD PROFILE");
-      await refreshProfile();
-      console.log("PROFILE SELESAI");
+    mounted.current = true;
+    refreshProfile();
 
+    return () => {
+      mounted.current = false;
+      profileRequestId.current++;
     };
-
-    loadProfile();
   }, []);
 
   const value: AuthContextType = {

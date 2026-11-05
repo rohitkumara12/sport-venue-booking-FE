@@ -51,13 +51,32 @@ export interface AvailableMembership {
 
 export interface AdminTransaction {
   id: string;
+  type : "BOOKING_PAYMENT" | "MEMBERSHIP_PURCHASE";
   status: TransactionStatus;
   amount: number;
   paymentProofUrl: string | null;
   expiresAt: string | null;
   updatedAt: string;
   user: { name: string; email: string };
-  booking: { id: string; startTime: string; endTime: string; court: { id: string; name: string } } | null;
+  booking: { 
+    id: string; 
+    startTime: string; 
+    endTime: string; 
+    court: { id: string; name: string } } 
+    | null;
+    
+    membership : {
+      id : string;
+      status : string;
+      totalSessions : number;
+      remainingSessions : number;
+      startsAt : string | null;
+      expiresAt : string | null;
+      membershipPlan : {
+        id : string;
+        name : string
+      };
+} | null
 }
 
 export interface CourtReview {
@@ -66,4 +85,13 @@ export interface CourtReview {
   comment: string | null;
   createdAt: string;
   user: { name: string; profile_Image: string };
+}
+
+
+export interface AdminBooking extends Booking {
+  customer : {
+    id : string ;
+    name : string;
+    email : string;
+  };
 }

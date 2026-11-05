@@ -35,38 +35,38 @@ export default function LoginPage() {
   });
 
   async function onSubmit(data: LoginFormValues) {
-    console.log("Login form valid:", data);
-     try {
-      console.log("mulai login")
-
+  try {
     const result = await loginRequest(data);
-    console.log("login berhasil",result)
+    console.log("Login berhasil:", result);
 
-    const profile =   await GetProfile()
-    console.log("profile berhasil",profile)
-    console.log("Role :",profile.data.role)
+    // Ambil profile sekaligus update state AuthContext
+    const profile = await refreshProfile();
 
-
-    if(profile.data.role === 'ADMIN') {
-      router.replace('/admin');
-    } else  if (profile.data.role === 'USER'){
-      router.replace('/dashboard')
-    } else{
-       console.error("Role tidak dikenali:", profile.data.role);
+    if (!profile) {
+      console.error("Gagal mengambil profile setelah login");
+      return;
     }
-    
+
+    console.log("Profile berhasil:", profile);
+    console.log("Role:", profile.role);
+
+    if (profile.role === "ADMIN") {
+      router.replace("/admin");
+    } else if (profile.role === "USER") {
+      router.replace("/");
+    } else {
+      console.error("Role tidak dikenali:", profile.role);
+    }
   } catch (error) {
-    if(axios.isAxiosError(error)){
-      console.error("Request Gagal",error.config?.url)
-      console.error("Status:",error.response?.status);
-      console.error("Response Backend :",error.response?.data)
-    }else{
-      console.error("error : ",error)
-      
+    if (axios.isAxiosError(error)) {
+      console.error("Request gagal:", error.config?.url);
+      console.error("Status:", error.response?.status);
+      console.error("Response Backend:", error.response?.data);
+    } else {
+      console.error("Error:", error);
     }
   }
-
-  }
+}
  
 
   return (
